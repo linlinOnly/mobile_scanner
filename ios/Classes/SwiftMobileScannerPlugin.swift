@@ -38,7 +38,7 @@ public class SwiftMobileScannerPlugin: NSObject, FlutterPlugin {
     init(barcodeHandler: BarcodeHandler, registry: FlutterTextureRegistry) {
         self.mobileScanner = MobileScanner(registry: registry, mobileScannerCallback: { barcodes, error, image in
             if barcodes != nil {
-                let barcodesMap = barcodes!.compactMap { barcode in
+                let barcodesMap = barcodes?.compactMap { barcode -> [String : Any?]? in
                     if (SwiftMobileScannerPlugin.scanWindow != nil) {
                         if (SwiftMobileScannerPlugin.isBarcodeInScanWindow(barcode: barcode, imageSize: image.size)) {
                             return barcode.data
@@ -49,7 +49,7 @@ public class SwiftMobileScannerPlugin: NSObject, FlutterPlugin {
                         return barcode.data
                     }
                 }
-                if (!barcodesMap.isEmpty) {
+                if (barcodesMap != nil && !(barcodesMap!.isEmpty)) {
                     barcodeHandler.publishEvent(["name": "barcode", "data": barcodesMap, "image": FlutterStandardTypedData(bytes: image.jpegData(compressionQuality: 0.8)!), "width": image.size.width, "height": image.size.height])
                 }
             } else if (error != nil){
